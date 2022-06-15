@@ -15,4 +15,12 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
+## Password security requirements 
+
+* Must be at least 12 characters
+* Must contain uppercase letters
+* Must contain at least 2 numbers
+* Must contain at least one special character
+* Must not contain any repeated special characters
+
 Enjoy!
