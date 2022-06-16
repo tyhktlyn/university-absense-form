@@ -23,4 +23,18 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
 * Must contain at least one special character
 * Must not contain any repeated special characters
 
+Example of a valid password:
+
+company name: mcdonalds
+given word: pies
+
+password generator : Mcdonaldsellspies701{#
+
+Example of invalid password:
+
+company name: kfc 
+given word: chips
+
+password generator : kfcloveschips1##
+
 Enjoy!
