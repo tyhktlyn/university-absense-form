@@ -5,14 +5,23 @@ import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.apigateway.RestApi;
 import software.amazon.awscdk.services.apigateway.EndpointType;
 import software.amazon.awscdk.services.apigateway.SecurityPolicy;
 import software.amazon.awscdk.services.certificatemanager.Certificate;
+import software.amazon.awscdk.services.cloudfront.Distribution;
+import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
+import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
+import software.amazon.awscdk.services.cloudfront.origins.S3Origin;
+import software.amazon.awscdk.services.cloudfront.origins.S3OriginProps;
 import software.amazon.awscdk.services.apigateway.DomainName;
 import software.amazon.awscdk.services.apigateway.Resource;
 import software.amazon.awscdk.services.apigateway.LambdaIntegration;
 import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.s3.deployment.BucketDeployment;
+import software.amazon.awscdk.services.s3.BucketAccessControl;
+import software.amazon.awscdk.services.s3.deployment.Source;
 import software.amazon.awscdk.services.ssm.StringParameter;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
@@ -90,6 +99,30 @@ public class PasswordGeneratorStack extends Stack {
         retrievePath.addMethod("GET", new LambdaIntegration(PasswordRetrievalFunction));
         generatePath.addMethod("PUT", new LambdaIntegration(PasswordGeneratorFunction));
 
-        // TODO: S3 bucket public static website hosting
+        final Bucket webAssetsBucket = Bucket.Builder.create(this, "webAssetsBucket")
+        .bucketName("web-assets-bucket")
+        .removalPolicy(RemovalPolicy.DESTROY)
+        .accessControl(BucketAccessControl.PRIVATE)
+        .build();
+
+        final OriginAccessIdentity cloudFrontS3AccessIdentity = OriginAccessIdentity.Builder.create(this, "webAssetsBucketAccessIdentity").build();
+
+        webAssetsBucket.grantRead(cloudFrontS3AccessIdentity);
+
+        final Distribution webDistribution = Distribution.Builder.create(this, "cloudFrontWebDistribution")
+        .defaultRootObject("index.html")
+        .defaultBehavior(BehaviorOptions.builder()
+            .origin(new S3Origin(webAssetsBucket, S3OriginProps.builder()
+                .originAccessIdentity(cloudFrontS3AccessIdentity)
+                .build()))
+            .build())
+        .domainNames(Arrays.asList("www.password-generator.tracd-projects.uk"))
+        .build();
+
+        final BucketDeployment webDeploymentBucket = BucketDeployment.Builder.create(this, "webDeploymentBucket")
+        .sources(Arrays.asList(Source.asset("path to ui folder")))
+        .destinationBucket(Bucket.fromBucketArn(this, "bucket", webAssetsBucket.getBucketArn()))
+        .distribution(webDistribution)
+        .build();
     }
 }
