@@ -119,7 +119,7 @@ public class PasswordGeneratorStack extends Stack {
         .domainNames(Arrays.asList("www.password-generator.tracd-projects.uk"))
         .build();
 
-        final BucketDeployment webDeploymentBucket = BucketDeployment.Builder.create(this, "webDeploymentBucket")
+        BucketDeployment.Builder.create(this, "webDeploymentBucket")
         .sources(Arrays.asList(Source.asset("path to ui folder")))
         .destinationBucket(Bucket.fromBucketArn(this, "bucket", webAssetsBucket.getBucketArn()))
         .distribution(webDistribution)
