@@ -17,11 +17,10 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
 
 ## Password security requirements 
 
-* Must be at least 12 characters
+* Must be at least 8 characters
 * Must contain uppercase letters
 * Must contain at least 2 numbers
 * Must contain at least one special character
-* Must not contain any repeated special characters
 
 Example of a valid password:
 
