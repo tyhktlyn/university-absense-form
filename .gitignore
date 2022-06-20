@@ -6,6 +6,7 @@ target
 .settings
 .vscode
 *.iml
+*.drawio
 
 # CDK asset staging directory
 .cdk.staging
