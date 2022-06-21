@@ -24,7 +24,7 @@ public class Retrieve implements RequestHandler<String, String> {
     final String companyName = queryParams.get("companyName");
     final String randomWord = queryParams.get("randomWord");
 
-    public Retrieve(String companyName, String rand){
+    public Retrieve(String companyName, String randomWord){
        this.companyName = companyName;
        this.randomWord = randomWord;
     }
