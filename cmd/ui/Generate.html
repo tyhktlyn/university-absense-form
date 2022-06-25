@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <body>
-<center>
-  <h1>Generate Password</h1>
-  <label for="Username">Username:</label>
+  <center>
+    <h1>Generate Password</h1>
+    <script>
+      const storePasswords = async (userName, companyName, randomWord) => {
+        const response = await fetch('api-url' + new URLSearchParams({
+          userName: userName,
+          companyName: companyName,
+          randomWord: randomWord
+        }, 
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }));
+
+        const responseStatus = await response.status(); //extract JSON from the http response
+        if (responseStatus == 200) {
+          // display something to indicate success
+        } else {
+          //display something to indicate api call failure
+        }
+      }
+    </script>
+    <label for="Username">Username:</label>
     <input type="text" id="uname">
-  <br>
-  <br>
-  <label for="compname">Company name:</label>
-  <input type="text" id="compname"><br><br>
-  <label for="randname">Random word:</label>
-  <input type="text" id="randname"><br><br>
-  
-  <button class = "submit" type = "submit"> Generate password</button>
-</center>
+    <label for="compname">Company name:</label>
+    <input type="text" id="compname"><br><br>
+    <label for="randname">Random word:</label>
+    <input type="text" id="randword"><br><br>
 
-
+    <button class="submit" type="submit" onclick="storePasswords(uname, compname, randword)"> Generate password</button>
+  </center>
 </body>
 </html>
