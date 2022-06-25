@@ -48,6 +48,7 @@ public class PasswordGeneratorStack extends Stack {
         super(scope, id, props);
         final Bucket PasswordFileBucket = Bucket.Builder.create(this, "passwordFileBucket")
         .bucketName("password-file-bucket")
+        .encryption(BucketEncryption.S3_MANAGED)
         .versioned(true)
         .build();
 
@@ -126,47 +127,47 @@ public class PasswordGeneratorStack extends Stack {
 
         PasswordRetrievalFunction.addToRolePolicy(retrieveFunctionPolicy);
 
-        // final String apiCertArn = StringParameter.fromStringParameterName(this, "apiCertArn", "api-cert-arn").getStringValue();
+        final String apiCertArn = StringParameter.fromStringParameterName(this, "apiCertArn", "api-cert-arn").getStringValue();
 
-        // DomainName.Builder.create(this, "passwordGeneratorApiDomainName")
-        // .domainName("api.tracd-projects.uk")
-        // .certificate(Certificate.fromCertificateArn(this, "apiAuthenticationCert", apiCertArn))
-        // .endpointType(EndpointType.EDGE)
-        // .basePath("password-generator")
-        // .securityPolicy(SecurityPolicy.TLS_1_2).build();
+        DomainName.Builder.create(this, "passwordGeneratorApiDomainName")
+        .domainName("api.tracd-projects.uk")
+        .certificate(Certificate.fromCertificateArn(this, "apiAuthenticationCert", apiCertArn))
+        .endpointType(EndpointType.EDGE)
+        .basePath("password-generator")
+        .securityPolicy(SecurityPolicy.TLS_1_2).build();
 
-        // final RestApi passwordGeneratorApi = RestApi.Builder.create(this, "passwordGeneratorApi").restApiName("password-generator-api").build();
+        final RestApi passwordGeneratorApi = RestApi.Builder.create(this, "passwordGeneratorApi").restApiName("password-generator-api").build();
 
-        // final Resource retrievePath = passwordGeneratorApi.getRoot().addResource("retrieve");
-        // final Resource generatePath = passwordGeneratorApi.getRoot().addResource("generate");
+        final Resource retrievePath = passwordGeneratorApi.getRoot().addResource("retrieve");
+        final Resource generatePath = passwordGeneratorApi.getRoot().addResource("generate");
 
-        // retrievePath.addMethod("GET", new LambdaIntegration(PasswordRetrievalFunction));
-        // generatePath.addMethod("PUT", new LambdaIntegration(PasswordGeneratorFunction));
+        retrievePath.addMethod("GET", new LambdaIntegration(PasswordRetrievalFunction));
+        generatePath.addMethod("PUT", new LambdaIntegration(PasswordGeneratorFunction));
 
-        // final Bucket webAssetsBucket = Bucket.Builder.create(this, "passwordGeneratorWebAssetsBucket")
-        // .bucketName("password-generatir-web-assets-bucket")
-        // .removalPolicy(RemovalPolicy.DESTROY)
-        // .accessControl(BucketAccessControl.PRIVATE)
-        // .build();
+        final Bucket webAssetsBucket = Bucket.Builder.create(this, "passwordGeneratorWebAssetsBucket")
+        .bucketName("password-generatir-web-assets-bucket")
+        .removalPolicy(RemovalPolicy.DESTROY)
+        .accessControl(BucketAccessControl.PRIVATE)
+        .build();
 
-        // final OriginAccessIdentity cloudFrontS3AccessIdentity = OriginAccessIdentity.Builder.create(this, "webAssetsBucketAccessIdentity").build();
+        final OriginAccessIdentity cloudFrontS3AccessIdentity = OriginAccessIdentity.Builder.create(this, "webAssetsBucketAccessIdentity").build();
 
-        // webAssetsBucket.grantRead(cloudFrontS3AccessIdentity);
+        webAssetsBucket.grantRead(cloudFrontS3AccessIdentity);
 
-        // final Distribution webDistribution = Distribution.Builder.create(this, "cloudFrontWebDistribution")
-        // .defaultRootObject("index.html")
-        // .defaultBehavior(BehaviorOptions.builder()
-        //     .origin(new S3Origin(webAssetsBucket, S3OriginProps.builder()
-        //         .originAccessIdentity(cloudFrontS3AccessIdentity)
-        //         .build()))
-        //     .build())
-        // .domainNames(Arrays.asList("www.password-generator.tracd-projects.uk"))
-        // .build();
+        final Distribution webDistribution = Distribution.Builder.create(this, "cloudFrontWebDistribution")
+        .defaultRootObject("index.html")
+        .defaultBehavior(BehaviorOptions.builder()
+            .origin(new S3Origin(webAssetsBucket, S3OriginProps.builder()
+                .originAccessIdentity(cloudFrontS3AccessIdentity)
+                .build()))
+            .build())
+        .domainNames(Arrays.asList("www.password-generator.tracd-projects.uk"))
+        .build();
 
-        // BucketDeployment.Builder.create(this, "webDeploymentBucket")
-        // .sources(Arrays.asList(Source.asset("./src/ui")))
-        // .destinationBucket(Bucket.fromBucketArn(this, "bucket", webAssetsBucket.getBucketArn()))
-        // .distribution(webDistribution)
-        // .build();
+        BucketDeployment.Builder.create(this, "webDeploymentBucket")
+        .sources(Arrays.asList(Source.asset("./src/ui")))
+        .destinationBucket(Bucket.fromBucketArn(this, "bucket", webAssetsBucket.getBucketArn()))
+        .distribution(webDistribution)
+        .build();
     }
 }
