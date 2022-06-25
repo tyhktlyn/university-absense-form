@@ -155,7 +155,7 @@ public class PasswordGeneratorStack extends Stack {
         webAssetsBucket.grantRead(cloudFrontS3AccessIdentity);
 
         final Distribution webDistribution = Distribution.Builder.create(this, "cloudFrontWebDistribution")
-        .defaultRootObject("index.html")
+        .defaultRootObject("Homepage.html")
         .defaultBehavior(BehaviorOptions.builder()
             .origin(new S3Origin(webAssetsBucket, S3OriginProps.builder()
                 .originAccessIdentity(cloudFrontS3AccessIdentity)
@@ -165,7 +165,7 @@ public class PasswordGeneratorStack extends Stack {
         .build();
 
         BucketDeployment.Builder.create(this, "webDeploymentBucket")
-        .sources(Arrays.asList(Source.asset("./src/ui")))
+        .sources(Arrays.asList(Source.asset("../cmd/ui")))
         .destinationBucket(Bucket.fromBucketArn(this, "bucket", webAssetsBucket.getBucketArn()))
         .distribution(webDistribution)
         .build();
