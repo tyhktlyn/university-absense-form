@@ -74,7 +74,7 @@ public class Validate {
             }
         }
 
-        if (password.length() >= min_length && password.length() <= max_length && uplCount >= min_upp && digit >= num_digits && special >= specialChar) {
+        if (password.length() >= min_length && password.length() <= max_length && uplCount >= min_upp && digit >= num_digits && specialChar >= special) {
             return true;
         } else {
             System.out.println("Your password (" + password + ") does not contain:");

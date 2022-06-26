@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import java.util.Map;
+import java.util.HashMap;
 
 public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
   @Override
@@ -32,7 +33,9 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     response.setStatusCode(200);
     response.setBody(String.join("\n", responseBody));
 
-    System.out.println(response.getBody());
+    response.setHeaders(new HashMap<String, String>() {{
+      put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
+    }});
 
     return response;
   }

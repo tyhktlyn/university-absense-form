@@ -10,6 +10,7 @@ import software.amazon.awscdk.BundlingOutput;
 import software.amazon.awscdk.BundlingOptions;
 import software.amazon.awscdk.DockerVolume;
 import software.amazon.awscdk.services.apigateway.RestApi;
+import software.amazon.awscdk.services.apigateway.CorsOptions;
 import software.amazon.awscdk.services.apigateway.BasePathMappingOptions;
 import software.amazon.awscdk.services.apigateway.EndpointType;
 import software.amazon.awscdk.services.apigateway.SecurityPolicy;
@@ -138,6 +139,12 @@ public class PasswordGeneratorStack extends Stack {
 
         final RestApi passwordGeneratorApi = RestApi.Builder.create(this, "passwordGeneratorApi")
         .restApiName("password-generator-api")
+        .defaultCorsPreflightOptions(CorsOptions.builder()
+        .allowHeaders(Arrays.asList("Content-Type"))
+        .allowOrigins(Arrays.asList("https://password-generator.tracd-projects.uk"))
+        .allowMethods(Arrays.asList("GET", "PUT", "OPTIONS"))
+        .allowCredentials(true)
+        .build())
         .build();
 
         apiDomainName.addBasePathMapping(passwordGeneratorApi, BasePathMappingOptions.builder().basePath("password-generator").build());
@@ -146,7 +153,7 @@ public class PasswordGeneratorStack extends Stack {
         final Resource generatePath = passwordGeneratorApi.getRoot().addResource("generate");
 
         retrievePath.addMethod("GET", new LambdaIntegration(PasswordRetrievalFunction));
-        generatePath.addMethod("PUT", new LambdaIntegration(PasswordGeneratorFunction));
+        generatePath.addMethod("GET", new LambdaIntegration(PasswordGeneratorFunction));
 
         final Bucket webAssetsBucket = Bucket.Builder.create(this, "passwordGeneratorWebAssetsBucket")
         .bucketName("password-generator-web-assets-bucket")

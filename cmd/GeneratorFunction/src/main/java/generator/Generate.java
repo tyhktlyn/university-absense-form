@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 
 import java.io.FileNotFoundException;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -50,6 +51,9 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
 
     response.setStatusCode(200);
     response.setBody("successfully generated your password: " + usersInfo.m_Password);
+    response.setHeaders(new HashMap<String, String>() {{
+      put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
+    }});
 
     return response;
   }
