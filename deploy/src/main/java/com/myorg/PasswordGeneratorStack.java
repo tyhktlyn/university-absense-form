@@ -10,6 +10,7 @@ import software.amazon.awscdk.BundlingOutput;
 import software.amazon.awscdk.BundlingOptions;
 import software.amazon.awscdk.DockerVolume;
 import software.amazon.awscdk.services.apigateway.RestApi;
+import software.amazon.awscdk.services.apigateway.BasePathMappingOptions;
 import software.amazon.awscdk.services.apigateway.EndpointType;
 import software.amazon.awscdk.services.apigateway.SecurityPolicy;
 import software.amazon.awscdk.services.certificatemanager.Certificate;
@@ -129,14 +130,17 @@ public class PasswordGeneratorStack extends Stack {
 
         final String apiCertArn = StringParameter.fromStringParameterName(this, "apiCertArn", "api-cert-arn").getStringValue();
 
-        DomainName.Builder.create(this, "passwordGeneratorApiDomainName")
+        final DomainName apiDomainName = DomainName.Builder.create(this, "passwordGeneratorApiDomainName")
         .domainName("api.tracd-projects.uk")
         .certificate(Certificate.fromCertificateArn(this, "apiAuthenticationCert", apiCertArn))
         .endpointType(EndpointType.EDGE)
-        .basePath("password-generator")
         .securityPolicy(SecurityPolicy.TLS_1_2).build();
 
-        final RestApi passwordGeneratorApi = RestApi.Builder.create(this, "passwordGeneratorApi").restApiName("password-generator-api").build();
+        final RestApi passwordGeneratorApi = RestApi.Builder.create(this, "passwordGeneratorApi")
+        .restApiName("password-generator-api")
+        .build();
+
+        apiDomainName.addBasePathMapping(passwordGeneratorApi, BasePathMappingOptions.builder().basePath("password-generator").build());
 
         final Resource retrievePath = passwordGeneratorApi.getRoot().addResource("retrieve");
         final Resource generatePath = passwordGeneratorApi.getRoot().addResource("generate");
@@ -145,7 +149,7 @@ public class PasswordGeneratorStack extends Stack {
         generatePath.addMethod("PUT", new LambdaIntegration(PasswordGeneratorFunction));
 
         final Bucket webAssetsBucket = Bucket.Builder.create(this, "passwordGeneratorWebAssetsBucket")
-        .bucketName("password-generatir-web-assets-bucket")
+        .bucketName("password-generator-web-assets-bucket")
         .removalPolicy(RemovalPolicy.DESTROY)
         .accessControl(BucketAccessControl.PRIVATE)
         .build();
@@ -161,7 +165,8 @@ public class PasswordGeneratorStack extends Stack {
                 .originAccessIdentity(cloudFrontS3AccessIdentity)
                 .build()))
             .build())
-        .domainNames(Arrays.asList("www.password-generator.tracd-projects.uk"))
+        .domainNames(Arrays.asList("password-generator.tracd-projects.uk"))
+        .certificate(Certificate.fromCertificateArn(this, "cloudFrontWebAuthenticationCert", apiCertArn))
         .build();
 
         BucketDeployment.Builder.create(this, "webDeploymentBucket")

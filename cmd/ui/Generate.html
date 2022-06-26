@@ -6,7 +6,7 @@
     <h1>Generate Password</h1>
     <script>
       const storePasswords = async (userName, companyName, randomWord) => {
-        const response = await fetch('api-url' + new URLSearchParams({
+        const response = await fetch('api.tracd-projects.uk/password-generator/generate' + new URLSearchParams({
           userName: userName,
           companyName: companyName,
           randomWord: randomWord
