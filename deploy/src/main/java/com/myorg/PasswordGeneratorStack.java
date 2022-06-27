@@ -84,7 +84,7 @@ public class PasswordGeneratorStack extends Stack {
         final Function PasswordGeneratorFunction = Function.Builder.create(this, "passwordGeneratorFunction")
         .runtime(Runtime.JAVA_11)
         .functionName("password-generator-function")
-        .memorySize(256)
+        .memorySize(1536)
         .timeout(Duration.seconds(45))
         .code(Code.fromAsset("../cmd/", AssetOptions.builder()
                         .bundling(builderOptions
@@ -100,7 +100,7 @@ public class PasswordGeneratorStack extends Stack {
         .principal(new ServicePrincipal("apigateway.amazonaws.com")).build());
 
         final PolicyStatement generatorFunctionPolicy = PolicyStatement.Builder.create()
-        .actions(Arrays.asList("s3:PutObject"))
+        .actions(Arrays.asList("s3:PutObject", "s3:GetObject"))
         .resources(Arrays.asList(PasswordFileBucket.getBucketArn() + "/*")).build();
 
         PasswordGeneratorFunction.addToRolePolicy(generatorFunctionPolicy);
@@ -108,7 +108,7 @@ public class PasswordGeneratorStack extends Stack {
         final Function PasswordRetrievalFunction = Function.Builder.create(this, "passwordRetrievalFunction")
         .runtime(Runtime.JAVA_11)
         .functionName("password-retrieval-function")
-        .memorySize(256)
+        .memorySize(1536)
         .timeout(Duration.seconds(45))
         .code(Code.fromAsset("../cmd/", AssetOptions.builder()
                         .bundling(builderOptions

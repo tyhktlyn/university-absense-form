@@ -5,9 +5,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,16 +41,13 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
 
   public static InputStream GetFileFromS3(String fileName) {
     String bucketName = "password-file-bucket";
-    String clientRegion = "eu-west-2";
 
-    AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-        .withRegion(clientRegion)
-        .build();
+    S3Client s3Client = S3Client.create();
 
-    GetObjectRequest request = new GetObjectRequest(bucketName, fileName);
+    GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
     try {
-      return s3Client.getObject(request).getObjectContent();
+      return s3Client.getObject(request);
     } catch (Exception e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.

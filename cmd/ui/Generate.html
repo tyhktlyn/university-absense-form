@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <body>
   <center>
     <h1>Generate Password</h1>
@@ -24,7 +23,7 @@
         }));
 
         const responseStatus = response.status;
-        const responseBody = response.body;
+        const responseBody = await response.text();
         if (responseStatus == 200) {
           logs.value = responseBody
         } else {
@@ -38,8 +37,8 @@
     <input type="text" id="compname"><br><br>
     <label for="randname">Random word:</label>
     <input type="text" id="randword"><br><br>
-    <button class="submit" type="submit" onclick="storePasswords()"> Generate password</button>
-    <input type="text" id="logs"><br><br>
+    <button class="submit" type="submit" onclick="storePasswords()"> Generate password</button><br><br>
+    <textarea type="text" id="logs" rows="4" cols="50"></textarea>
   </center>
 </body>
 </html>
