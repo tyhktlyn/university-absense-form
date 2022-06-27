@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <center>
+    <h1>Generate Password</h1>
+    <script>
+      const storePasswords = async () => {
+        const userName = document.getElementById("uname").value
+        const companyName = document.getElementById("compname").value
+        const randomWord = document.getElementById("randword").value
+        const logs = document.getElementById("logs")
+
+        const response = await fetch('https://api.tracd-projects.uk/password-generator/generate?' + new URLSearchParams({
+          userName: userName,
+          companyName: companyName,
+          randomWord: randomWord
+        }, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }));
+
+        const responseStatus = response.status;
+        const responseBody = await response.text();
+        if (responseStatus == 200) {
+          logs.value = responseBody
+        } else {
+          logs.value = "api call failed with status: " + responseStatus
+        }
+      }
+    </script>
+    <label for="Username">Username:</label>
+    <input type="text" id="uname">
+    <label for="compname">Company name:</label>
+    <input type="text" id="compname"><br><br>
+    <label for="randname">Random word:</label>
+    <input type="text" id="randword"><br><br>
+    <button class="submit" type="submit" onclick="storePasswords()"> Generate password</button><br><br>
+    <textarea type="text" id="logs" rows="4" cols="50"></textarea>
+  </center>
+</body>
+</html>

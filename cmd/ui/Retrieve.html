@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <center>
+        <h1>Retrieve Password</h1>
+        <script>
+            const getPasswords = async () => {
+              const userName = document.getElementById("uname").value
+              const logs = document.getElementById("logs")
+      
+              const response = await fetch('https://api.tracd-projects.uk/password-generator/retrieve?' + new URLSearchParams({
+                userName: userName
+              }, 
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              }));
+      
+              const responseStatus = response.status;
+              const responseBody = await response.text();
+              if (responseStatus == 200) {
+                logs.value = responseBody
+              } else {
+                logs.value = "api call failed with status: " + responseStatus
+              }
+            }
+          </script>
+        <label for="Username">Username:</label>
+        <input type="text" id="uname"><br><br>
+        <button class="submit" type="submit" onclick="getPasswords()">Retrieve password</button><br><br>
+        <textarea type="text" id="logs" rows="4" cols="50"></textarea>
+    </center>
+</body>
+</html>
