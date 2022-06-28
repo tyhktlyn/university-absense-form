@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
 
     try {
       return s3Client.getObject(request);
-    } catch (NoSuchKeyException e) {
+    } catch (S3Exception e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.
       System.out.println("file doesn't exist, proceeding to create a new one");
