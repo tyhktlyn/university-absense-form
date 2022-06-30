@@ -29,7 +29,7 @@ import java.io.PrintWriter;
 import org.apache.commons.io.IOUtils;
 
 public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-  private static Logger logger = Logger.getLogger(Validate.class.getName());
+  private static Logger logger = Logger.getLogger(Generate.class.getName());
 
   @Override
 
@@ -52,7 +52,6 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
     logger.log(Level.FINE, "Password has been created");
 
     boolean isValid = Validate.validatePassword(usersInfo.m_Password);
-    logger.log(Level.FINE, "Password has been created");
 
     while (!isValid) {
       usersInfo.m_Password = usersInfo.CreatePass(symbolAmount, new Random().nextBoolean());
@@ -66,6 +65,7 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
       logger.log(Level.INFO, "Trying to write to file");
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+      logger.log(Level.WARNING, "Writing to file failed");
     }
 
     response.setStatusCode(200);
@@ -93,9 +93,11 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
 
     try {
       s3Client.putObject(request, RequestBody.fromFile(fileContents));
+      logger.log(Level.INFO, "Uploading file to s3");
       s3Client.close();
     } catch (Exception e) {
       e.printStackTrace();
+      logger.log(Level.WARNING, "Upload failed");
     }
   }
 
@@ -112,6 +114,7 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
       logger.log(Level.INFO, "file doesn't exist, proceeding to create a new one");
       return null;
     }
+
   }
 
   public static void WriteToFile(Data infoToSave, S3Client s3Client) throws FileNotFoundException {
@@ -136,6 +139,8 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
       logger.log(Level.SEVERE, "An error occurred.");
       e.printStackTrace();
     }
+
+    logger.log(Level.FINER, "data appended successfully");
 
     try (FileWriter f = new FileWriter(passwordFile, true);
         BufferedWriter b = new BufferedWriter(f);

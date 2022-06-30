@@ -14,11 +14,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.util.Map;
 import java.util.HashMap;
 
 public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+  private static Logger logger = Logger.getLogger(Retrieve.class.getName());
+
   @Override
   public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
     APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
@@ -32,9 +36,11 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     response.setStatusCode(200);
     response.setBody(String.join("\n", responseBody));
 
-    response.setHeaders(new HashMap<String, String>() {{
-      put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
-    }});
+    response.setHeaders(new HashMap<String, String>() {
+      {
+        put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
+      }
+    });
 
     return response;
   }
@@ -51,8 +57,11 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     } catch (Exception e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.
+      logger.log(Level.WARNING, "The call was transmitted successfully, but Amazon S3 couldn't process");
       e.printStackTrace();
     }
+
+    logger.log(Level.FINE, "The call was transmitted successfully and Amazon S3 processed successfully");
 
     return null;
   }
@@ -71,12 +80,13 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
       }
       return records;
     } catch (IOException e) {
-      System.out.println("An error occurred.");
+      logger.log(Level.WARNING, "An error occurred.");
       e.printStackTrace();
     } finally {
       try {
         reader.close();
       } catch (IOException e) {
+        logger.log(Level.WARNING, "An error occurred. File was not able to close successfully");
         e.printStackTrace();
       }
     }
