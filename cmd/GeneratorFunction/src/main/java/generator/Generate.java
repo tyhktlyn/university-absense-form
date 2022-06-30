@@ -14,7 +14,8 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,10 @@ import java.io.PrintWriter;
 import org.apache.commons.io.IOUtils;
 
 public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+  private static Logger logger = Logger.getLogger(Generate.class.getName());
+
   @Override
+
   public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
     final S3Client s3Client = S3Client.create();
 
@@ -40,10 +44,12 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
     final String companyName = queryParams.get("companyName");
     final String randomWord = queryParams.get("randomWord");
     Data usersInfo = new Data(userName, companyName, randomWord);
+    logger.log(Level.FINE, "New user information has been entered and stored as a new entry");
 
     int symbolAmount = randomNumberGenerator();
 
     usersInfo.m_Password = usersInfo.CreatePass(symbolAmount, new Random().nextBoolean());
+    logger.log(Level.FINE, "Password has been created");
 
     boolean isValid = Validate.validatePassword(usersInfo.m_Password);
 
@@ -52,17 +58,23 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
       isValid = Validate.validatePassword(usersInfo.m_Password);
     }
 
+    logger.log(Level.FINE, "Password has gone through the validator and is valid ");
+
     try {
       WriteToFile(usersInfo, s3Client);
+      logger.log(Level.INFO, "Trying to write to file");
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+      logger.log(Level.WARNING, "Writing to file failed");
     }
 
     response.setStatusCode(200);
     response.setBody("successfully generated your password: " + usersInfo.m_Password);
-    response.setHeaders(new HashMap<String, String>() {{
-      put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
-    }});
+    response.setHeaders(new HashMap<String, String>() {
+      {
+        put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
+      }
+    });
 
     return response;
   }
@@ -81,9 +93,11 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
 
     try {
       s3Client.putObject(request, RequestBody.fromFile(fileContents));
+      logger.log(Level.INFO, "Uploading file to s3");
       s3Client.close();
     } catch (Exception e) {
       e.printStackTrace();
+      logger.log(Level.WARNING, "Upload failed");
     }
   }
 
@@ -97,33 +111,36 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
     } catch (S3Exception e) {
       // The call was transmitted successfully, but Amazon S3 couldn't process
       // it, so it returned an error response.
-      System.out.println("file doesn't exist, proceeding to create a new one");
+      logger.log(Level.INFO, "file doesn't exist, proceeding to create a new one");
       return null;
     }
+
   }
 
   public static void WriteToFile(Data infoToSave, S3Client s3Client) throws FileNotFoundException {
     String newFileName = infoToSave.m_Username + ".csv";
     File passwordFile = new File("/tmp/" + newFileName);
-    //check if file already exists in s3 bucket store
+    // check if file already exists in s3 bucket store
     InputStream fileContents = checkFileExists(newFileName, s3Client);
 
     try {
       if (fileContents == null) {
         try (PrintWriter out = new PrintWriter(passwordFile)) {
-          System.out.println("File created: " + passwordFile.getName());
+          logger.log(Level.INFO, "File created: " + passwordFile.getName());
           out.printf("%s, %s, %s\n", "Business", "Special Word", "Password");
           out.flush();
         }
       } else {
-        System.out.println("File already exists, so will append to existing file");
+        logger.log(Level.INFO, "File already exists, so will append to existing file");
         OutputStream outputStream = new FileOutputStream(passwordFile);
         IOUtils.copy(fileContents, outputStream);
       }
     } catch (IOException e) {
-      System.out.println("An error occurred.");
+      logger.log(Level.SEVERE, "An error occurred.");
       e.printStackTrace();
     }
+
+    logger.log(Level.FINER, "data appended successfully");
 
     try (FileWriter f = new FileWriter(passwordFile, true);
         BufferedWriter b = new BufferedWriter(f);
@@ -131,7 +148,7 @@ public class Generate implements RequestHandler<APIGatewayProxyRequestEvent, API
 
       p.printf("%s, %s, %s\n", infoToSave.m_CompanyName, infoToSave.m_RandomWord, infoToSave.m_Password);
       p.flush();
-      System.out.println("Data added");
+      logger.log(Level.INFO, "Data added");
     } catch (IOException i) {
       i.printStackTrace();
     }

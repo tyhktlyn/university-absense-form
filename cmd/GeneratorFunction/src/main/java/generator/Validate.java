@@ -1,6 +1,11 @@
 package generator;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Validate {
+    private static Logger logger = Logger.getLogger(Validate.class.getName());
+
     public static boolean validatePassword(String password) {
         final int num_digits = 2;
         final int special = 1;
@@ -22,7 +27,7 @@ public class Validate {
                 digit++;
             }
 
-            switch(c) {
+            switch (c) {
                 case '$':
                     specialChar++;
                     break;
@@ -73,25 +78,32 @@ public class Validate {
                     break;
             }
         }
+        logger.log(Level.INFO, "Uppercase letters " + uplCount + ", Digits " + digit + " and Special Characters "
+                + specialChar + ". The total length of the password is " + password.length());
 
-        if (password.length() >= min_length && password.length() <= max_length && uplCount >= min_upp && digit >= num_digits && specialChar >= special) {
+        if (password.length() >= min_length && password.length() <= max_length && uplCount >= min_upp
+                && digit >= num_digits && specialChar >= special) {
+            logger.log(Level.FINE, "The password passes the requirements necessary - " + password);
             return true;
         } else {
-            System.out.println("Your password (" + password + ") does not contain:");
+            logger.log(Level.SEVERE, "ERROR: Password not valid");
+
             if (password.length() < min_length) {
-                System.out.println("at least 8 characters");
+                logger.log(Level.SEVERE, "at least 8 characters");
+            } else if (password.length() > max_length) {
+                logger.log(Level.SEVERE, "More than 20 characters");
             }
 
             if (uplCount < min_upp) {
-                System.out.println("at least one uppercase letter");
+                logger.log(Level.SEVERE, "at least one uppercase letter");
             }
 
             if (digit < num_digits) {
-                System.out.println("at least 2 numeric characters");
+                logger.log(Level.SEVERE, "at least 2 numeric characters");
             }
 
             if (specialChar < special) {
-                System.out.println("at least 1 special character");
+                logger.log(Level.SEVERE, "at least 1 special character");
             }
 
             return false;
