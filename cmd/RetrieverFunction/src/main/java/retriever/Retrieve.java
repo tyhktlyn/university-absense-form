@@ -25,13 +25,26 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
 
   @Override
   public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+    S3Client s3Client = S3Client.create();
     APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
 
     final Map<String, String> queryParams = event.getQueryStringParameters();
 
     final String userName = queryParams.get("userName");
 
-    List<String> responseBody = RetrieveUserData(userName);
+    List<String> responseBody = RetrieveUserData(userName, s3Client);
+
+    if (checkUserExists(Username + ".csv", s3Client) == null){
+      response.setStatusCode(400);
+      response.setBody("Bad request: username does not exist!");
+
+      response.setHeaders(new HashMap<String, String>() {{
+        put("Access-Control-Allow-Origin", "https://password-generator.tracd-projects.uk");
+      }});
+
+      return response;
+
+    }
 
     response.setStatusCode(200);
     response.setBody(String.join("\n", responseBody));
@@ -45,10 +58,8 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     return response;
   }
 
-  public static InputStream GetFileFromS3(String fileName) {
+  public static InputStream GetFileFromS3(String fileName, S3Client s3Client) {
     String bucketName = "password-file-bucket";
-
-    S3Client s3Client = S3Client.create();
 
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
@@ -66,9 +77,24 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     return null;
   }
 
-  public static List<String> RetrieveUserData(String Username) {
+  public static InputStream checkUserExists(String fileName, S3Client s3Client) {
+    String bucketName = "password-file-bucket";
+
+    GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
+
+    try {
+      return s3Client.getObject(request);
+    } catch (S3Exception e) {
+      // The call was transmitted successfully, but Amazon S3 couldn't process
+      // it, so it returned an error response.
+      System.out.println("this username doesn't exist, proceeding to create a new one");
+      return null;
+    }
+  }
+
+  public static List<String> RetrieveUserData(String Username, S3Client s3Client) {
     String newFileName = Username + ".csv";
-    InputStream retrievedFile = GetFileFromS3(newFileName);
+    InputStream retrievedFile = GetFileFromS3(newFileName, s3Client);
     BufferedReader reader = null;
     String Line = "";
     List<String> records = new ArrayList<String>();
@@ -92,4 +118,4 @@ public class Retrieve implements RequestHandler<APIGatewayProxyRequestEvent, API
     }
     return new ArrayList<String>();
   }
-}
+} 
