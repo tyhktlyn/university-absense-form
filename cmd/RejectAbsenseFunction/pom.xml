@@ -3,8 +3,8 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>retriever</groupId>
-    <artifactId>RetrieverFunction</artifactId>
+    <groupId>rejecter</groupId>
+    <artifactId>RejectAbsenseFunction</artifactId>
     <version>0.1</version>
 
     <properties>
@@ -46,7 +46,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>retriever.Retrieve</mainClass>
+                    <mainClass>rejecter.Reject</mainClass>
                 </configuration>
             </plugin>
         </plugins>

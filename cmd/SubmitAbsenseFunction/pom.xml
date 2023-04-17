@@ -3,8 +3,8 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>generator</groupId>
-    <artifactId>GeneratorFunction</artifactId>
+    <groupId>submitter</groupId>
+    <artifactId>SubmitAbsenseFunction</artifactId>
     <version>0.1</version>
 
     <properties>
@@ -46,7 +46,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>generator.Generate</mainClass>
+                    <mainClass>submitter.Submit</mainClass>
                 </configuration>
             </plugin>
         </plugins>
