@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Absence Request Form</title>
+	<style>
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
+        .container {
+			background-color: #ffffff;
+			padding: 20px;
+			margin: 100px auto;
+			width: 800px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px #c3c3c3;
+		}
+		input[type="text"], input[type="email"], input[type="datetime-local"] {
+			width: 100%;
+			padding: 8px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			box-sizing: border-box;
+			margin-bottom: 20px;
+			font-size: 16px;
+		}
+		input[type="submit"] {
+			background-color: #4CAF50;
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 16px;
+		}
+		input[type="submit"]:hover {
+			background-color: #45a049;
+		}
+	</style>
+</head>
+<body>
+    <div class="container">
+    <h1>Absence Request Form</h1>
+	<form>
+		<label for="student-email">Student Email</label>
+		<input type="email" id="student-email" name="student-email" required>
+
+		<label for="teacher-email">Teacher Email</label>
+		<input type="email" id="teacher-email" name="teacher-email" required>
+
+		<label for="module-id">Module ID</label>
+		<input type="text" id="module-id" name="module-id" required>
+
+		<label for="start-datetime">Start Date Time</label>
+		<input type="datetime-local" id="start-datetime" name="start-datetime" required>
+
+		<label for="end-datetime">End Date Time</label>
+		<input type="datetime-local" id="end-datetime" name="end-datetime" required>
+
+		<label for="absence-reason">Absence Reason</label>
+		<input type="text" id="absence-reason" name="absence-reason" required>
+
+		<input type="submit" value="Submit" onclick="location.href='SubmissionConfirmed.html';">
+	</form>
+</div>
+</body>
+</html>

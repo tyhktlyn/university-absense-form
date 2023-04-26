@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Absence Requests</title>
+	<style>
+		body {
+			background-color: #f1f1f1;
+			font-family: Arial, sans-serif;
+		}
+		
+		.container {
+			background-color: #ffffff;
+			padding: 20px;
+			margin: 100px auto;
+			width: 800px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px #c3c3c3;
+		}
+		
+		h2 {
+			text-align: center;
+		}
+		
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 20px;
+		}
+		
+		table td,
+		table th {
+			padding: 10px;
+			border: 1px solid #ddd;
+			text-align: left;
+			font-size: 16px;
+		}
+		
+		table th {
+			background-color: #f1f1f1;
+			font-weight: bold;
+		}
+		
+		.table-row-link {
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Absence Requests</h2>
+		<table>
+			<tr>
+				<th>Student Email</th>
+				<th>Module ID</th>
+				<th>Start Date Time</th>
+				<th>End Date Time</th>
+			</tr>
+			<tr class="table-row-link" onclick="location.href='AcceptReject.html';">
+				<td>jane.doe@example.com</td>
+				<td>MATH101</td>
+				<td>2023-04-20 09:00</td>
+				<td>2023-04-20 11:00</td>
+			</tr>
+			<tr class="table-row-link" onclick="location.href='AcceptReject.html';">
+				<td>john.doe@example.com</td>
+				<td>CHEM101</td>
+				<td>2023-04-21 10:00</td>
+				<td>2023-04-21 12:00</td>
+			</tr>
+			<tr class="table-row-link" onclick="location.href='AcceptReject.html';">
+				<td>susan.smith@example.com</td>
+				<td>PHYS101</td>
+				<td>2023-04-22 11:00</td>
+				<td>2023-04-22 13:00</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
