@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Absence Form Details</title>
+	<style>
+		body {
+			background-color: #f1f1f1;
+			font-family: Arial, sans-serif;
+		}
+		
+		.container {
+			background-color: #ffffff;
+			padding: 20px;
+			margin: 100px auto;
+			width: 800px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px #c3c3c3;
+		}
+		
+		h2 {
+			text-align: center;
+		}
+		
+        label {
+			display: block;
+			margin-bottom: 10px;
+            padding-top: 100px;
+		}
+
+        input[type="text"], input[type="email"], input[type="datetime-local"] {
+			width: 100%;
+			padding: 8px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			box-sizing: border-box;
+			margin-bottom: 20px;
+			font-size: 16px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 20px;
+		}
+		
+		table td,
+		table th {
+			padding: 10px;
+			border: 1px solid #ddd;
+			text-align: left;
+			font-size: 16px;
+		}
+		
+		table th {
+			background-color: #f1f1f1;
+			font-weight: bold;
+		}
+		
+		.btn-group {
+			margin-top: 20px;
+		}
+		
+		.btn {
+			display: inline-block;
+			padding: 8px 16px;
+			margin-right: 10px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+		
+		.btn:hover {
+			background-color: #3e8e41;
+		}
+		
+		.btn-danger {
+			background-color: #f44336;
+		}
+		
+		.btn-danger:hover {
+			background-color: #cc2929;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Absence Form Details</h2>
+		<table>
+			<tr>
+				<th>Field</th>
+				<th>Value</th>
+			</tr>
+			<tr>
+				<td>Student Email</td>
+				<td>jane.doe@example.com</td>
+			</tr>
+			<tr>
+				<td>Module ID</td>
+				<td>MATH101</td>
+			</tr>
+			<tr>
+				<td>Start Date Time</td>
+				<td>2023-04-20 09:00</td>
+			</tr>
+			<tr>
+				<td>End Date Time</td>
+				<td>2023-04-20 11:00</td>
+			</tr>
+			<tr>
+				<td>Absence Reason</td>
+				<td>Sick</td>
+			</tr>
+		</table>
+        <label for="absence-reason">Absence Reason</label>
+		    <input type="text" id="absence-reason" name="absence-reason" required>
+		<div class="btn-group">
+			<button class="btn" onclick="location.href='Accepted.html';">Accept</button>
+			<button class="btn btn-danger" onclick="location.href='Rejected.html';">Reject</button>            
+		</div>
+	</div>
+</body>
+</html>
