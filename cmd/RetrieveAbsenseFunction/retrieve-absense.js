@@ -1,35 +1,52 @@
-const client = require("../../config");
-
-const getRecordsByTeacher = async (teacher_email) => {
-    const params = {
-        database: client.params.database,
-        resourceArn: client.params.resourceArn,
-        secretArn: client.params.secretArn,
-        sql: 'SELECT * FROM AbsenceRequests WHERE teacher_email = :teacher_email',
-        parameters: [
-            { name: 'teacher_email', value: { stringValue: teacher_email } }
-        ]
-    };
-
-    try {
-        const result = await client.executeStatement(params).promise();
-        console.log(result);
-        return result.records;
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
-}
+var mysql = require("mysql2/promise");
+var AWS = require("aws-sdk");
+var logger = console;
+logger.info("Generate database token...");
 
 const retreive = async (req, res) => {
 
+    const dbSecretName = process.env.DB_SECRET_NAME || '';
+    const client = new AWS.SecretsManager({
+        region: "eu-west-2"
+    });
+
+    // Retrieve the secret value
+    const secretValue = await client.getSecretValue({ SecretId: dbSecretName }).promise();
+
+    let secretJson = ""
+    if ('SecretString' in secretValue) {
+        secretJson = JSON.parse(secretValue.SecretString);
+    } else {
+        secretJson = JSON.parse(Buffer.from(secretValue.SecretBinary, 'base64').toString('ascii'));
+    }
+
+    if (!secretJson) {
+        throw new Error('secret string is empty');
+    }
+
+    logger.info(`secret successfully obtained. Connecting to database...`);
+    const database_connection = await mysql.createConnection({
+        host: secretJson.host,
+        port: parseInt(secretJson.port),
+        database: secretJson.dbname,
+        user: secretJson.username,
+        password: secretJson.password,
+    });
+    logger.info("Connected!!");
+
     try {
 
-        const teacher_email = req.body.teacher_email;
-        const response = await getRecordsByTeacher(teacher_email);
+        const employee_id = req.body.employee_id;
+
+        const result = await database_connection.query(
+            `SELECT * FROM requests WHERE employee_id = ${employee_id}`
+        );
+        logger.info(`Read data from request table`);
+        
+        console.log(result);
 
         return res
-            .json(response)
+            .json(result.records)
             .status(200);
 
     } catch (err) {

@@ -1,12 +1,48 @@
+const AWS = require('aws-sdk');
 const ses = new AWS.SES();
 
 const reject = async (req, res) => {
 
+    const dbSecretName = process.env.DB_SECRET_NAME || '';
+    const client = new AWS.SecretsManager({
+        region: "eu-west-2"
+    });
+
+    // Retrieve the secret value
+    const secretValue = await client.getSecretValue({ SecretId: dbSecretName }).promise();
+
+    let secretJson = ""
+    if ('SecretString' in secretValue) {
+        secretJson = JSON.parse(secretValue.SecretString);
+    } else {
+        secretJson = JSON.parse(Buffer.from(secretValue.SecretBinary, 'base64').toString('ascii'));
+    }
+
+    if (!secretJson) {
+        throw new Error('secret string is empty');
+    }
+
+    logger.info(`secret successfully obtained. Connecting to database...`);
+    const database_connection = await mysql.createConnection({
+        host: secretJson.host,
+        port: parseInt(secretJson.port),
+        database: secretJson.dbname,
+        user: secretJson.username,
+        password: secretJson.password,
+    });
+    logger.info("Connected!!");
+
     try {
-        const formId = req.body.form_id;
-        // get the student details from the form id
-        const studentRecord = 'something';
+
+        const request_id = req.body.request_id;
+        const student_id = req.body.student_id;
+
+        const studentRecord = await database_connection.query(
+            `SELECT * FROM requests WHERE student_id = ${student_id}`
+        );
+
         await absenseCheck(studentRecord);
+
         console.log('Rejection complete.');
     } catch (err) {
         console.log(err);
@@ -16,7 +52,7 @@ const reject = async (req, res) => {
 
 const absenseCheck = (studentRecord) => {
 
-    if (studentRecord.attendanceRate > 0.5) {
+    if (studentRecord.absence_counter > 5) {
         emailStudentWarning(studentRecord);
         return;
     } else {
@@ -27,8 +63,8 @@ const absenseCheck = (studentRecord) => {
 
 const emailStudentWarning = async (studentRecord) => {
     const subject = `Absense Request Update`;
-    const body = `To ${studentRecord.first_name} ${studentRecord.surame}, Your absense request had been rejected. This is an attendance warning because your attendance has dropped below 50%.`;
-    const recipient = `${studentRecord.student_email}`;
+    const body = `To ${studentRecord.first_name} ${studentRecord.surame}, Your absense request had been rejected. This is an attendance warning because you have missed more than 5 sessions.`;
+    const recipient = `${studentRecord.email}`;
     sendEmail(subject, body, recipient)
         .then(() => {
             console.log('Email sent successfully');
@@ -41,8 +77,8 @@ const emailStudentWarning = async (studentRecord) => {
 
 const emailStudentReason = async (studentRecord) => {
     const subject = `Absense Request Update`;
-    const body = `To ${studentRecord.first_name} ${studentRecord.surame}, Your absense request had been rejected for reason: ${}. Please discuss the matter with your module leader.`;
-    const recipient = `${studentRecord.student_email}`;
+    const body = `To ${studentRecord.first_name} ${studentRecord.surame}, Your absense request had been rejected. Please discuss the matter with your module leader.`;
+    const recipient = `${studentRecord.email}`;
     sendEmail(subject, body, recipient)
         .then(() => {
             console.log('Email sent successfully');
@@ -68,7 +104,7 @@ const sendEmail = async (subject, body, recipient) => {
                 Data: subject
             }
         },
-        Source: 'your-ses-email-address'
+        Source: 'accenturewebgroup@gmail.com'
     };
 
     return ses.sendEmail(params).promise();
