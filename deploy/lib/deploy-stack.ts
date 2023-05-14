@@ -198,13 +198,13 @@ export class AbsenseFormStack extends cdk.Stack {
       }
     );
 
-    const sourceDirectory = '../../cmd/ui';
-    new BucketDeployment(this, "webDeploymentBucket", {
-      sources: [Source.asset(sourceDirectory)],
-      destinationBucket: webAssetsBucket,
-      distribution: webDistribution,
-      distributionPaths: ["/*"],
-    });
+    // const sourceDirectory = '../cmd/ui';
+    // new BucketDeployment(this, "webDeploymentBucket", {
+    //   sources: [Source.asset(sourceDirectory)],
+    //   destinationBucket: webAssetsBucket,
+    //   distribution: webDistribution,
+    //   distributionPaths: ["/*"],
+    // });
 
     new cdk.CfnOutput(this, "dbEndpoint", {
       value: dbInstance.instanceEndpoint.hostname,

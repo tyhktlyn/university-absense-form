@@ -35,7 +35,7 @@ exports.handler = async (event, context) => {
     try {
         await database_connection.query(
             `CREATE TABLE IF NOT EXISTS students (
-            student_id VARCHAR(9) NOT NULL AUTO_INCREMENT,
+            student_id VARCHAR(9) NOT NULL,
             first_name VARCHAR(255) NOT NULL,
             surname VARCHAR(255) NOT NULL,
             absence_counter INT(2) NOT NULL,
@@ -46,7 +46,7 @@ exports.handler = async (event, context) => {
         logger.info('Created table "students"');
         await database_connection.query(
             `CREATE TABLE IF NOT EXISTS teachers (
-            employee_id VARCHAR(9) NOT NULL AUTO_INCREMENT,
+            employee_id VARCHAR(9) NOT NULL,
             first_name VARCHAR(255) NOT NULL,
             surname VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
@@ -55,20 +55,20 @@ exports.handler = async (event, context) => {
         logger.info('Created table "teachers"');
         await database_connection.query(
             `CREATE TABLE IF NOT EXISTS requests (
-            request_id INT(9) NOT NULL AUTO_INCREMENT,
+            request_id INT(9) NOT NULL,
             student_id INT(9) NOT NULL,
             employee_id INT(9) NOT NULL,
             module_id INT(9) NOT NULL,
             start_date DATETIME NOT NULL,
             end_date DATETIME NOT NULL,
             absence_reason VARCHAR(500) NOT NULL,
-            approved ENUM(0, 1) NOT NULL,
+            approved TINYINT(1) NOT NULL,
             PRIMARY KEY (request_id))`
         );
         logger.info('Created table "requests"');
         await database_connection.query(
             `CREATE TABLE IF NOT EXISTS modules (
-            module_id INT(9) NOT NULL AUTO_INCREMENT,
+            module_id INT(9) NOT NULL,
             module_name VARCHAR(255) NOT NULL,
             PRIMARY KEY (module_id))`
         );
